@@ -1,24 +1,27 @@
 package com.sct;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.URLDecoder;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.net.*;
+import java.io.*;
 
 public class Server implements Runnable {
 Thread mainthread;
 int running=1;
 String scope;
+ServerSocket ssock;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
               
+	}
+	public void shutdown()
+	{
+		try {
+			ssock.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 public Server(String scope)
 {
@@ -31,10 +34,9 @@ public Server(String scope)
 			try {
 				SecondFrame sf = new SecondFrame();
 				sf.open(scope, false, 2);
-				ServerSocket ssock = new ServerSocket(7722);
+				ssock = new ServerSocket(7722);
 				while(running==1)
 				{
-					byte[] data = new byte[1000];
 					Socket client=ssock.accept();
 					
 					InputStream cli = client.getInputStream();

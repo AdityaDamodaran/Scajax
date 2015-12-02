@@ -1,0 +1,8 @@
+<plugin type="1">
+<title name="AngularJS GET 1">
+	<regex captgrps="1">
+		<re>\$http\.get\((.*)\)</re>
+		<cg name="url"></cg>
+	</regex>
+</title>
+</plugin>

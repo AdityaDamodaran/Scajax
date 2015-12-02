@@ -1,0 +1,8 @@
+<plugin type="1">
+<title name="JQuery 4">
+	<regex captgrps="1">
+		<re>\$\.ajax\(\{\s*url:(.w*),</re>
+		<cg name="url"></cg>
+	</regex>
+</title>
+</plugin>

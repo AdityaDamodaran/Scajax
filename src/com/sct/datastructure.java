@@ -23,23 +23,26 @@ public class datastructure {
 		this.URL=aURL;
 		this.method=amethod;
 		this.page=aPage;
-		if(this.method.substring(0, 3).equals("GET"))
+		if(this.method.indexOf("GET")!=-1)
 		{
-			
-			String temp = this.URL.substring(this.URL.indexOf("?")+1,this.URL.length()-this.URL.indexOf("?")+1);
+			if(this.URL.indexOf("?")!=-1){
+				try{
+			String temp = this.URL.substring(this.URL.indexOf("?"));
 			this.URL=this.URL.substring(0,this.URL.indexOf("?"));
 			temp=temp.substring(1);
-			temp=temp.substring(0,temp.length()-1);
+		//	temp=temp.substring(0,temp.length()-1);
 			Pattern rJSON = Pattern.compile("/(?:\"(\\\\u[a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\\"])*\"(\\s*:)?|\\b(true|false|null)\\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?|([\\{\\}\\[\\]]))/"); 
 			Matcher mJSON = rJSON.matcher(temp);
-			Pattern rNVP = Pattern.compile("/(?:\\?|\\&)(?<key>[\\w]+)=(?<value>[\\w+,.-]+)(?:\\:?)(?<option>[\\w,]*)/");
-			Matcher mNVP = rNVP.matcher("?"+temp);
+		//	Pattern rNVP = Pattern.compile("/(?:\\?|\\&)(?<key>[\\w]+)=(?<value>[\\w+,.-]+)(?:\\:?)(?<option>[\\w,]*)/");
+			Pattern rNVP = Pattern.compile("(\\w*)=(\\w*)[\\&(\\w*)=(\\w*)]*");
+			Matcher mNVP = rNVP.matcher(temp);
 			if(mJSON.matches())
 			{
 				//JSON
 				contenttype="JSON";
 				parameters.add(temp);
 			}
+			
 			else if(mNVP.matches())
 			{
 				//NAME-VALUE PAIRS
@@ -59,6 +62,18 @@ public class datastructure {
 				contenttype="UNKNOWN";
 				parameters.add(temp);
 			}
+				}
+				catch(Exception e){
+					contenttype="UNKNOWN";
+					parameters.add("");
+						
+				}
+			}
+			else
+			{
+				contenttype="UNKNOWN";
+				parameters.add("");
+			}
 		}
 		else
 		{
@@ -66,10 +81,16 @@ public class datastructure {
 			
 			String temp =aParameter;// aParameter.substring(1);
 		//	temp=temp.substring(0,temp.length()-1);
+			temp=temp.trim();
+			if(temp.startsWith("\'")||temp.startsWith("\""))
+				temp=temp.substring(1);
+			if(temp.endsWith("\'")||temp.endsWith("\""))
+				temp=temp.substring(0,temp.length()-1);
+			
 			Pattern rJSON = Pattern.compile("/(?:\"(\\\\u[a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\\"])*\"(\\s*:)?|\\b(true|false|null)\\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?|([\\{\\}\\[\\]]))/"); 
 			Matcher mJSON = rJSON.matcher(temp);
-			Pattern rNVP = Pattern.compile("/(?:\\?|\\&)(?<key>[\\w]+)=(?<value>[\\w+,.-]+)(?:\\:?)(?<option>[\\w,]*)/");
-			Matcher mNVP = rNVP.matcher("?"+temp);
+			Pattern rNVP = Pattern.compile("(\\w*)=(\\w*)[\\&(\\w*)=(\\w*)]*");
+			Matcher mNVP = rNVP.matcher(temp);
 			if(mJSON.matches())
 			{
 				//JSON

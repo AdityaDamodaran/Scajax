@@ -1,0 +1,18 @@
+<plugin type="2">
+<title name="XHR 2">
+	<regex captgrps="1">
+		<re>var\s*(\w*)\s*=\s*new\s*XMLHttpRequest\(\);</re>
+		<cg name="$carry"></cg>
+	</regex>
+	<regex captgrps="3">
+		<re>\.open\((.*),(.*),(.*)\);</re>
+		<cg name="method"></cg>
+		<cg name="url"></cg>
+		<cg name="async"></cg>
+	</regex>
+	<regex captgrps="1">
+		<re>\.send\((.*)\);</re>
+		<cg name="param"></cg>
+	</regex>
+</title>
+</plugin>

@@ -1,79 +1,37 @@
 package com.sct;
 
+import java.io.*;
+import java.net.*;
+import java.util.regex.*;
+import javax.xml.parsers.*;
+import javax.xml.xpath.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.eclipse.swt.custom.TableEditor;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.custom.*;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Button;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.eclipse.swt.*;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebClientOptions;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.*;
+import com.gargoylesoftware.htmlunit.html.*;
 
 public class SecondFrame {
 
 	public Shell shell;
 	private Text text;
+	private Text text2;
 	private Table table;
 	public List list;
 	public String url2;
 	public boolean spider2;
+	public boolean verify;
 	public int mode2;
 	public datastructure[] localds = new datastructure[1000];
 	public int dscount=0;
 	public int sel =0;
-	/**
-	 * Launch the application.
-	 * @param args
-	 */
+	public URL jarpath = this.getClass().getProtectionDomain().getCodeSource().getLocation();
 	public static void main(String[] args) {
 		try {
 			SecondFrame window = new SecondFrame();
@@ -83,9 +41,7 @@ public class SecondFrame {
 		}
 	}
 
-	/**
-	 * Open the window.
-	 */
+	
 	public void open() {
 		Display display = Display.getDefault();
 		createContents();
@@ -97,15 +53,16 @@ public class SecondFrame {
 			}
 		}
 	}
-	public void open(String url, boolean spider, int mode) {
+	public void open(String url, boolean spider, boolean verify,int mode, final MainFrame mf) {
 		url2=url;
 		spider2=spider;
 		mode2=mode;
-		//Display display = Display.getDefault();
+		this.verify=verify;
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
 		    	createContents();
-				shell.open();
+		    	mf.frameLoaded();
+		    	shell.open();
 				shell.layout();
 			
 		    }
@@ -116,6 +73,26 @@ public class SecondFrame {
 		//	}
 	//	}
 	}
+	public void open(String url, boolean spider, int mode) {
+		url2=url;
+		spider2=spider;
+		mode2=mode;
+	
+		Display.getDefault().asyncExec(new Runnable() {
+		    public void run() {
+		    	createContents();
+		    	shell.open();
+				shell.layout();
+			
+		    }
+		});
+	//	while (!shell.isDisposed()) {
+		//	if (!display.readAndDispatch()) {
+			//	display.sleep();
+		//	}
+	//	}
+	}
+
 	public void scanner(String html,String pg) throws URISyntaxException{
 	/*	ClassLoader classloader = getClass().getClassLoader();
 		final URL urlf = classloader.getResource("/plugins");
@@ -128,8 +105,9 @@ public class SecondFrame {
 
 
 	*/
-		
-	File plugindir = new File("C:\\Dev\\SCT\\plugins");
+	//Debug:
+	//File plugindir = new File("C:\\Dev\\SCT\\plugins");
+	File plugindir = new File(jarpath.getPath()+"plugins");
 	Document plgxml;
 	DocumentBuilderFactory docb = DocumentBuilderFactory.newInstance();
 	
@@ -138,8 +116,8 @@ public class SecondFrame {
 		try {
 			dbuild = docb.newDocumentBuilder();
 			plgxml = dbuild.parse(plg);
-			Element doc = plgxml.getDocumentElement();
-			NodeList n = doc.getElementsByTagName("plugin");
+			//Element doc = plgxml.getDocumentElement();
+			//NodeList n = doc.getElementsByTagName("plugin");
 			//if(n.item(0).getAttributes().getNamedItem("type").toString()=="2")
 			//{
 			XPath xPath = XPathFactory.newInstance().newXPath();
@@ -147,54 +125,218 @@ public class SecondFrame {
 		    Node node = nodes.item(0);
 		        if(node.getTextContent().equals("1"))
 		        {
-		        	
+		        	String method="",endpoint="",param="";
+		        	System.out.println("Match 1 trial");
+		        	nodes = (NodeList) xPath.evaluate("//plugin/title/@name", plgxml, XPathConstants.NODESET);
+		        	node = nodes.item(0);
+		        	String title = node.getTextContent();
+		        	if (title.indexOf("GET")!=-1)
+		        	{
+		        		method="GET";
+		        	}
+		        	if (title.indexOf("POST")!=-1)
+		        	{
+		        		method="POST";
+		        	}
+		        	nodes = (NodeList) xPath.evaluate("//plugin/title/regex/@captgrps", plgxml, XPathConstants.NODESET);
+		        	node = nodes.item(0);
+		        	int cg = Integer.parseInt(node.getTextContent());
+		        	NodeList nodesmain = (NodeList) xPath.evaluate("//plugin/title/regex/re/text()", plgxml, XPathConstants.NODESET);
+		        	Node nodemain = nodesmain.item(0);
+		        	Pattern re1 = Pattern.compile(nodemain.getTextContent());
+		    					Matcher mat = re1.matcher(html);
+		    					
+		    					System.out.println(re1.pattern());
+		    					while(mat.find())
+		    					{
+		    						for(int k=0;k<cg;k++)
+		    						{
+		    							if(k==0)
+		    								nodes = (NodeList) xPath.evaluate("//plugin/title/regex/cg/@name", plgxml, XPathConstants.NODESET);
+		    							else
+		    								nodes = (NodeList) xPath.evaluate("//plugin/title/regex/cg["+(k+1)+"]/@name", plgxml, XPathConstants.NODESET);
+		    							node = nodes.item(0);
+		    				        	if(node.getTextContent().toLowerCase().equals("method"))
+		    				        	{
+		    				        		method=mat.group(k+1);
+		    				        	}
+		    				        	if(node.getTextContent().toLowerCase().equals("url"))
+		    				        	{
+		    				        		endpoint=mat.group(k+1);
+		    				        	}
+		    				        	if(node.getTextContent().toLowerCase().equals("param"))
+		    				        	{
+		    				        		param=mat.group(k+1);
+		    				        	}
+		    				        }
+		    						endpoint=endpoint.replaceAll("\""," ").trim();
+					        		int flag=1;
+					        		if(verify==true)
+					        		{
+					        		try{
+					    				final URL url = new URL(endpoint);
+					    				final URLConnection urlConnection = url.openConnection();
+					    				urlConnection.setDoOutput(true);
+					    				urlConnection.connect();
+					    				if(method.equals("POST"))
+					    				{
+					    				final OutputStream outputStream = urlConnection.getOutputStream();
+					    				outputStream.write(param.getBytes("UTF-8"));
+					    				outputStream.flush();
+					    				}
+					    					BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+					    					String inputLine;
+					    					String response ="";
+					    					while ((inputLine = in.readLine()) != null) 
+					    						response=response+inputLine;
+					    					in.close();
+					   
+					        			} catch (FileNotFoundException e1) {
+					    						new MessageBox(shell).setMessage("Page not found");
+					    					flag=0;
+					        			} catch (IOException e1) {
+					    					// TODO Auto-generated catch block
+					        				flag=0;
+					        			}
+					        			}
+					    				if(flag==1){
+		    			     		localds[dscount]= new datastructure(dscount,title, endpoint, method, pg, param);
+					        		dscount++;
+					    			}
+		    					}
+		        
 		        }
-		        if(node.getTextContent().equals("2"))
+		        else if(node.getTextContent().equals("2"))
 		        {
-		        	String method,endpoint,param;
+		        	
+		        	String method = "",endpoint = "",param="";
 		        	System.out.println("Match 1 trial");
 		        	nodes = (NodeList) xPath.evaluate("//plugin/title/@name", plgxml, XPathConstants.NODESET);
 		        	node = nodes.item(0);
 		        	String title = node.getTextContent();
 		        	nodes = (NodeList) xPath.evaluate("//plugin/title/regex/@captgrps", plgxml, XPathConstants.NODESET);
 		        	node = nodes.item(0);
-		        	int cg = Integer.parseInt(node.getTextContent());
-		        	nodes = (NodeList) xPath.evaluate("//plugin/title/regex/re/text()", plgxml, XPathConstants.NODESET);
-		        	node = nodes.item(0);
+		        	@SuppressWarnings("unused")
+					int cg = Integer.parseInt(node.getTextContent());
+		        	NodeList nodesmain = (NodeList) xPath.evaluate("//plugin/title/regex/re/text()", plgxml, XPathConstants.NODESET);
+		        	Node nodemain = nodesmain.item(0);
+		       /// 	nodes = (NodeList) xPath.evaluate("//plugin/title/regex/re/text()", plgxml, XPathConstants.NODESET);
+		        	//node = nodes.item(0);
 		        	
-		        	Pattern re1 = Pattern.compile(node.getTextContent());
+		        	Pattern re1 = Pattern.compile(nodemain.getTextContent());
 					Matcher mat = re1.matcher(html);
+					
 					System.out.println(re1.pattern());
-					if(mat.find())
+					while(mat.find())
 					{
 						System.out.println("Match 2 trial");	
 						nodes = (NodeList) xPath.evaluate("//plugin/title/regex[2]/re/text()", plgxml, XPathConstants.NODESET);
 			        	node = nodes.item(0);
 			        	Pattern re2 = Pattern.compile(mat.group(1).replaceAll("\u00A0", "").trim()+node.getTextContent());
 			    		Matcher mat2 = re2.matcher(html);
-						if(mat2.find())
+			    		System.out.println(re2.pattern());
+			    		if(mat2.find())
 						{
 							System.out.println("Match 3 trial");
-						//	nodes = (NodeList) xPath.evaluate("//plugin/title/regex[2]/cg/@name", plgxml, XPathConstants.NODESET);
-				        //	node = nodes.item(0);
-				        //	nodes = (NodeList) xPath.evaluate("//plugin/title/regex[2]/cg[2]/@name", plgxml, XPathConstants.NODESET);
-				        //	Node node2 = nodes.item(0);
-				        	//System.out.println(node.getTextContent()+mat2.group(1)+node2.getTextContent()+mat2.group(2));
-				        	method=mat2.group(0);
-				        	endpoint=mat2.group(1);
-				        //	NodeList nodes2 = (NodeList) xPath.evaluate("//plugin/title/regex[3]/re/text()", plgxml, XPathConstants.NODESET);
-				        //	node = nodes2.item(0);
-				        	
-				        	Pattern re3 = Pattern.compile(mat.group(1).replaceAll("\u00A0", "").trim()+"\\.send\\((.*)\\);");
+							NodeList nodescg = (NodeList) xPath.evaluate("//plugin/title/regex[2]/@captgrps", plgxml, XPathConstants.NODESET);
+				        	Node nodecg = nodescg.item(0);
+				        	int cg2 = Integer.parseInt(nodecg.getTextContent());
+							//System.out.println(node.getTextContent()+mat2.group(1)+node2.getTextContent()+mat2.group(2));
+				        	for(int k=0;k<cg2;k++)
+    						{
+    							if(k==0)
+    								nodes = (NodeList) xPath.evaluate("//plugin/title/regex[2]/cg/@name", plgxml, XPathConstants.NODESET);
+    							else
+    								nodes = (NodeList) xPath.evaluate("//plugin/title/regex[2]/cg["+(k+1)+"]/@name", plgxml, XPathConstants.NODESET);
+    							node = nodes.item(0);
+    				        	if(node.getTextContent().toLowerCase().equals("method"))
+    				        	{
+    				        		method=mat2.group(k+1);
+    				        	}
+    				        	if(node.getTextContent().toLowerCase().equals("url"))
+    				        	{
+    				        		endpoint=mat2.group(k+1);
+    				        	}
+    				        	if(node.getTextContent().toLowerCase().equals("param"))
+    				        	{
+    				        		param=mat2.group(k+1);
+    				        	}
+    				        }
+    			        	NodeList nodes2 = (NodeList) xPath.evaluate("//plugin/title/regex[3]/re/text()", plgxml, XPathConstants.NODESET);
+				        	node = nodes2.item(0);
+				        	Pattern re3 = Pattern.compile(mat.group(1).replaceAll("\u00A0", "").trim()+node.getTextContent());
 							Matcher mat3 = re3.matcher(html);
-						//	nodes = (NodeList) xPath.evaluate("//plugin/title/regex[3]/cg/@name", plgxml, XPathConstants.NODESET);
-				        //	node2 = nodes.item(0);
 							if(mat3.find())
 				        	{
-				        		param=mat3.group(0);
+								nodescg = (NodeList) xPath.evaluate("//plugin/title/regex[3]/@captgrps", plgxml, XPathConstants.NODESET);
+					        	nodecg = nodescg.item(0);
+					        	cg2 = Integer.parseInt(nodecg.getTextContent());
+					        	for(int k=0;k<cg2;k++)
+	    						{
+	    							if(k==0)
+	    								nodes = (NodeList) xPath.evaluate("//plugin/title/regex[3]/cg/@name", plgxml, XPathConstants.NODESET);
+	    							else
+	    								nodes = (NodeList) xPath.evaluate("//plugin/title/regex[3]/cg["+(k+1)+"]/@name", plgxml, XPathConstants.NODESET);
+	    							node = nodes.item(0);
+	    				        	if(node.getTextContent().toLowerCase().equals("method"))
+	    				        	{
+	    				        		method=mat3.group(k+1);
+	    				        	}
+	    				        	if(node.getTextContent().toLowerCase().equals("url"))
+	    				        	{
+	    				        		endpoint=mat3.group(k+1);
+	    				        	}
+	    				        	if(node.getTextContent().toLowerCase().equals("param"))
+	    				        	{
+	    				        		param=mat3.group(k+1);
+	    				        	}
+	    				        }
+					        	endpoint=endpoint.replaceAll("\""," ").trim();
+				        		endpoint=endpoint.replaceAll("\'"," ").trim();
+				        		if(endpoint.indexOf("http")==-1||endpoint.indexOf("ftp")==-1)
+				        		{
+				        			try{
+				        			endpoint=pg.substring(0,pg.lastIndexOf("/"))+"/"+endpoint;
+				        			
+				        			}
+				        			catch(Exception e)
+				        			{
+				        				System.out.println(pg);
+				        			}
+				        		}
+				        		int flag=1;
+				        		if(verify==true)
+				        		{
+				        		try{
+				    				final URL url = new URL(endpoint);
+				    				final URLConnection urlConnection = url.openConnection();
+				    				urlConnection.setDoOutput(true);
+				    				urlConnection.connect();
+				    				if(method.equals("POST"))
+				    				{
+				    				final OutputStream outputStream = urlConnection.getOutputStream();
+				    				outputStream.write(param.getBytes("UTF-8"));
+				    				outputStream.flush();
+				    				}
+				    					BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+				    					String inputLine;
+				    					String response ="";
+				    					while ((inputLine = in.readLine()) != null) 
+				    						response=response+inputLine;
+				    					in.close();
+				   
+				        			} catch (FileNotFoundException e1) {
+				    						new MessageBox(shell).setMessage("Page not found");
+				    					flag=0;
+				        			} catch (IOException e1) {
+				    					// TODO Auto-generated catch block
+				        				flag=0;
+				        			}
+				        			}
+				    				if(flag==1){
 				        		localds[dscount]= new datastructure(dscount,title, endpoint, method, pg, param);
 				        		dscount++;
-				        		//System.out.println(node2.getTextContent()+mat3.group(1));
+				    			}
 				        	}	
 						}
 					}
@@ -220,7 +362,8 @@ public class SecondFrame {
 		
 	public void fromServer(String sURL, String sMethod,final String sPage, String sParam)
 	{
-	//#debug	if(sPage.contains(url2))
+	//#debug	
+	//	if(sPage.indexOf(url2)!=-1)
 	//	{
 		localds[dscount]= new datastructure(dscount, sURL, sMethod, sPage, sParam);
 		dscount++;
@@ -243,19 +386,21 @@ if(flag==0){
 		});
 	//	}
 	}
+	public void crawl(String rawhtml)
+	{
+		rawhtml.replaceAll("\\s", " ");
 		
-	/**
-	 * Create contents of the window.
-	 */
+	}
+	
 	public void createContents() {
 		shell = new Shell();
-		shell.setSize(575, 300);
-		shell.setText("SWT Application");
-		final List list_1;
+		shell.setSize(876, 520);
+		shell.setText("Scanner");
+		final List list2;
 		Composite composite = new Composite(shell, SWT.NONE);
-		composite.setBounds(0, 10, 549, 241);
+		composite.setBounds(0, 10, 850, 461);
 		table = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setBounds(320, 71, 219, 123);
+		table.setBounds(471, 77, 369, 170);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		TableColumn tc1 = new TableColumn(table, SWT.LEFT);
@@ -267,14 +412,13 @@ if(flag==0){
 		Label lblWebpagesDetected = new Label(composite, SWT.NONE);
 		lblWebpagesDetected.setBounds(10, 10, 114, 15);
 		lblWebpagesDetected.setText("Webpages detected:");
-		list_1 = new List(composite, SWT.BORDER);
-		list_1.addSelectionListener(new SelectionListener() {
+		list2 = new List(composite, SWT.BORDER);
+		list2.addSelectionListener(new SelectionListener() {
 			
 			public void widgetSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-			//	System.out.println(list_1.getSelection()[0].substring(list_1.getSelection()[0].lastIndexOf("\\")+1));
+	
 			table.clearAll();
-			int id = Integer.parseInt(list_1.getSelection()[0].substring(list_1.getSelection()[0].lastIndexOf("\\")+1));
+			int id = Integer.parseInt(list2.getSelection()[0].substring(list2.getSelection()[0].lastIndexOf("\\")+1));
 			sel=id;
 			datastructure dsl = localds[id];
 			text.setText(dsl.URL);
@@ -342,7 +486,7 @@ if(flag==0){
 		         }
 		     });     
 		list = new List(composite, SWT.BORDER | SWT.V_SCROLL);
-		list.setBounds(10, 28, 132, 166);
+		list.setBounds(10, 28, 243, 219);
 		list.addSelectionListener(new SelectionListener() {
 			
 			public void widgetSelected(SelectionEvent e) {
@@ -350,13 +494,13 @@ if(flag==0){
 			String pgload=list.getSelection()[0];
 			System.out.println(list.getSelection()[0]);
 			datastructure dsl;
+			list2.removeAll();
 			for(int i=0;i<dscount;i++)
 			{
 				dsl=localds[i];
-				list_1.removeAll();
 				if(dsl.page.equals(pgload))
 				{
-				list_1.add(dsl.title+"\\"+dsl.id);
+				list2.add(dsl.title+"\\"+dsl.id);
 				}
 			}
 			}
@@ -368,7 +512,7 @@ if(flag==0){
 				{
 					if(dsl.page.equals(pgload))
 					{
-					list_1.add(dsl.title+"\\"+dsl.id);
+					list2.add(dsl.title+"\\"+dsl.id);
 					}
 				}
 					
@@ -376,25 +520,31 @@ if(flag==0){
 		});
 		
 		Label lblAjaxRequests = new Label(composite, SWT.NONE);
-		lblAjaxRequests.setBounds(160, 10, 101, 15);
+		lblAjaxRequests.setBounds(259, 10, 101, 15);
 		lblAjaxRequests.setText("AJAX requests:");
 		
-		list_1.setBounds(156, 28, 145, 166);
+		list2.setBounds(259, 28, 206, 219);
+		
+		text2 = new Text(composite, SWT.WRAP);
+		text2.setBounds(10,287,830,164);
 		
 		Label lblEndpoint = new Label(composite, SWT.NONE);
-		lblEndpoint.setBounds(320, 10, 55, 15);
+		lblEndpoint.setBounds(471, 10, 55, 15);
 		lblEndpoint.setText("Endpoint:");
 		
 		text = new Text(composite, SWT.BORDER);
-		text.setBounds(320, 29, 219, 21);
+		text.setBounds(471, 29, 369, 21);
 		
 		Label lblParameters = new Label(composite, SWT.NONE);
-		lblParameters.setBounds(320, 56, 71, 15);
+		lblParameters.setBounds(471, 56, 71, 15);
 		lblParameters.setText("Parameters:");
 		
+		Label lblResponse = new Label(composite, SWT.NONE);
+		lblResponse.setBounds(10, 266, 55, 15);
+		lblResponse.setText("Response:");
 		
 		Button btnNewButton = new Button(composite, SWT.NONE);
-		btnNewButton.setBounds(464, 206, 75, 25);
+		btnNewButton.setBounds(765, 253, 75, 25);
 		btnNewButton.setText("Fire Request");
 		btnNewButton.addMouseListener(new MouseListener() {
 			
@@ -453,8 +603,12 @@ if(flag==0){
 					while ((inputLine = in.readLine()) != null) 
 						response=response+inputLine;
 					in.close();
-					Report resp = new Report(shell, SWT.NONE, response);
-					resp.open();
+				//	Report resp = new Report(shell, SWT.NONE, response);
+				//	resp.open();
+					text2.setText(response);
+				} catch (FileNotFoundException e1) {
+						new MessageBox(shell).setMessage("Page not found");
+					e1.printStackTrace();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -490,7 +644,7 @@ if(flag==0){
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+				webclient.close();
 			//	Pattern re1 = Pattern.compile("var\\s*(.*)\\s*=\\s*new\\s*XMLHttpRequest\\(\\);");
 			//	Matcher mat = re1.matcher(htm.asXml());
 				

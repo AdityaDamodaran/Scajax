@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <plugin type="2">
 <title name="XHR 1">
 	<regex captgrps="1">
-		<re>var\\s*(.*)\\s*=\\s*new\\s*XMLHttpRequest\\(\\);</re>
+		<re>\s*(.\w*)\s*=\s*new\s*XMLHttpRequest\(\);</re>
 		<cg name="$carry"></cg>
 	</regex>
 	<regex captgrps="2">
-		<re>\\.open\\((.*),(.*)\\);</re>
+		<re>\.open\(([a-zA-z0-9_\"\']*),([a-zA-z0-9_\"\']*)\);</re>
 		<cg name="method"></cg>
 		<cg name="url"></cg>
 	</regex>
 	<regex captgrps="1">
-		<re>\\.send\\((.*)\\);</re>
+		<re>\.send\((.*)\);</re>
 		<cg name="param"></cg>
 	</regex>
 </title>

@@ -10,7 +10,10 @@ protected static Shell shell;
 private Text text;
 static Button btnAnalyse;
 static SecondFrame shell2;
-	
+Label progress;	
+MainFrame mf = this;
+Boolean verify=false;
+
 public static void main(String[] args) {
 		try {
 			MainFrame window = new MainFrame();
@@ -52,7 +55,11 @@ public void open() {
 		
 		final Button btnSpiderThisSite = new Button(composite, SWT.CHECK);
 		btnSpiderThisSite.setBounds(323, 39, 93, 16);
-		btnSpiderThisSite.setText("Spider this site");
+		btnSpiderThisSite.setText("Spider this site (Experimental)");
+		
+		final Button btnVerify = new Button(composite, SWT.CHECK);
+		btnVerify.setBounds(443, 39, 213, 16);
+		btnVerify.setText("Verify each endpoint");
 		
 		final Button btnStaticAnalysis = new Button(composite, SWT.RADIO);
 		btnStaticAnalysis.setBounds(10, 75, 96, 16);
@@ -65,6 +72,13 @@ public void open() {
 		Label lblStaticAnalysisScans = new Label(composite, SWT.NONE);
 		lblStaticAnalysisScans.setBounds(402, 80, 299, 38);
 		lblStaticAnalysisScans.setText("Static Analysis scans webpages for AJAX code patterns \r\nspecified in the plugins directory.");
+		
+		progress = new Label(composite, SWT.NONE);
+		progress.setBounds(10, 216, 406, 17);
+		progress.setText("Scanning, please wait...");
+		progress.setVisible(false);
+		
+		
 		
 		Label lblNewLabel = new Label(composite, SWT.NONE);
 		lblNewLabel.setBounds(402, 133, 299, 67);
@@ -118,8 +132,10 @@ public void open() {
 							if(btnStaticAnalysis.getSelection())
 							{
 								mode=1;
+							//	Splash loading = new Splash(shell, SWT.NONE);
+								progress.setVisible(true);
 								shell2 = new SecondFrame();
-								shell2.open(text.getText(), btnSpiderThisSite.getSelection(), mode);
+								shell2.open(text.getText(), btnSpiderThisSite.getSelection(), btnVerify.getSelection(), mode, mf );
 								
 							}
 							else
@@ -142,7 +158,7 @@ public void open() {
 				// TODO Auto-generated method stub
 				
 			}});
-		text.setText("http://localhost/Diss/Jax.html");
+	//	text.setText("http://localhost/Diss/Jax.html");
 		shell.setText("Scajax Beta");
 Menu bar = new Menu (shell, SWT.BAR);
 			shell.setMenuBar (bar);
@@ -158,5 +174,9 @@ Menu bar = new Menu (shell, SWT.BAR);
 				}
 			});
 		
+	}
+	public void frameLoaded()
+	{
+		progress.setVisible(false);
 	}
 }

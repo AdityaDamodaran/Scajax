@@ -1,0 +1,8 @@
+<plugin type="1">
+<title name="JQuery 3">
+	<regex captgrps="1">
+		<re>\$\.ajax\(\{\s*url:\s*\"(.*)\",</re>
+		<cg name="url"></cg>
+	</regex>
+</title>
+</plugin>

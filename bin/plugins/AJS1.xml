@@ -1,0 +1,9 @@
+<plugin type="1">
+<title name="AngularJS POST 1">
+	<regex captgrps="2">
+		<re>\$http\.get\((.*),(.*)\)</re>
+		<cg name="url"></cg>
+		<cg name="param"></cg>
+	</regex>
+</title>
+</plugin>
