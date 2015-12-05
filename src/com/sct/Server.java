@@ -32,8 +32,8 @@ public Server(String scope)
 		synchronized (this) {
 			this.mainthread = Thread.currentThread();
 			try {
-				SecondFrame sf = new SecondFrame();
-				sf.open(scope, false, 2);
+				ScanWindow sw = new ScanWindow();
+				sw.open(scope, false, 2);
 				ssock = new ServerSocket(7722);
 				while(running==1)
 				{
@@ -84,7 +84,7 @@ public Server(String scope)
 			             System.out.println("Method:"+URLDecoder.decode(bd[1].split("=")[1], "UTF-8"));
 			             System.out.println("Page:"+URLDecoder.decode(bd[2].split("=")[1], "UTF-8"));
 				         System.out.println("Body:"+URLDecoder.decode(bd[3].split("=")[1], "UTF-8"));
-			            sf.fromServer(URLDecoder.decode(bd[0].split("=")[1], "UTF-8"), URLDecoder.decode(bd[1].split("=")[1], "UTF-8"), URLDecoder.decode(bd[2].split("=")[1], "UTF-8"), URLDecoder.decode(bd[3].split("=")[1], "UTF-8"));
+			            sw.fromServer(URLDecoder.decode(bd[0].split("=")[1], "UTF-8"), URLDecoder.decode(bd[1].split("=")[1], "UTF-8"), URLDecoder.decode(bd[2].split("=")[1], "UTF-8"), URLDecoder.decode(bd[3].split("=")[1], "UTF-8"));
 				    				        		
 				//       output.flush();
 				       client.close();

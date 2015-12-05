@@ -17,7 +17,7 @@ import org.xml.sax.SAXException;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.*;
 
-public class SecondFrame {
+public class ScanWindow {
 
 	public Shell shell;
 	private Text text;
@@ -34,7 +34,7 @@ public class SecondFrame {
 	public URL jarpath = this.getClass().getProtectionDomain().getCodeSource().getLocation();
 	public static void main(String[] args) {
 		try {
-			SecondFrame window = new SecondFrame();
+			ScanWindow window = new ScanWindow();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -53,7 +53,7 @@ public class SecondFrame {
 			}
 		}
 	}
-	public void open(String url, boolean spider, boolean verify,int mode, final MainFrame mf) {
+	public void open(String url, boolean spider, boolean verify,int mode, final MainWindow mw) {
 		url2=url;
 		spider2=spider;
 		mode2=mode;
@@ -61,7 +61,7 @@ public class SecondFrame {
 		Display.getDefault().asyncExec(new Runnable() {
 		    public void run() {
 		    	createContents();
-		    	mf.frameLoaded();
+		    	mw.frameLoaded();
 		    	shell.open();
 				shell.layout();
 			
@@ -668,14 +668,11 @@ if(flag==0){
 				
 					
 			} catch (FailingHttpStatusCodeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 			
 			
