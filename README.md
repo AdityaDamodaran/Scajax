@@ -14,7 +14,7 @@ The dynamic analysis engine uses a Google chrome extension to interact with webs
 3. Select the folder named "extension" listed in this repository, in the 'build' folder
 
 ##Using the Scanner
-1. Enable the browser extension in Google Chrome from the [chrome://extensions/](Chrome Extensions) page
+1. Enable the browser extension in Google Chrome from the [Chrome Extensions](chrome://extensions/) page
 2. Run the AJAXScanner.jar file
 3. Enter the URL of the site to be scanned in the URL text field
 4. Select either the Static or the Dynamic analysis radio button
