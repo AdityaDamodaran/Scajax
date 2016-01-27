@@ -13,11 +13,14 @@ The dynamic analysis engine uses a Google chrome extension to interact with webs
 2. Click on the "Load unpacked extension" button
 ![Image 1](https://github.com/AdityaDamodaran/Scajax/raw/master/doc/screenshots/img1.png)
 3. Select the folder named "extension" listed in this repository, in the 'build' directory
+![Image 2](https://github.com/AdityaDamodaran/Scajax/raw/master/doc/screenshots/img2.png)
 
 ##Using the Scanner
 1. Enable the browser extension in Google Chrome from the [Chrome Extensions](chrome://extensions/) page
+![Image 3](https://github.com/AdityaDamodaran/Scajax/raw/master/doc/screenshots/img3.png)
 2. Run the AJAXScanner.jar file
 3. Enter the URL of the site to be scanned in the URL text field
+![Image 4](https://github.com/AdityaDamodaran/Scajax/raw/master/doc/screenshots/img4.png)
 4. Select either the Static or the Dynamic analysis radio button
 5. Check the 'Spider this site' checkbox, if spidering is required.
 6. Click on the 'Analyse' button
