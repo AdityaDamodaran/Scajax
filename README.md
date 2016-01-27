@@ -11,7 +11,7 @@ The dynamic analysis engine uses a Google chrome extension to interact with webs
 ##Installing the Chrome Extension (required for dynamic analysis)
 1. Navigate to [chrome://extensions/](chrome://extensions/) in Google Chrome
 2. Click on the "Load unpacked extension" button
-![Image 1](https://github.com/AdityaDamodaran/Scajax/doc/Screenshots/img1.png)
+![Image 1](https://github.com/AdityaDamodaran/Scajax/doc/screenshots/img1.png)
 3. Select the folder named "extension" listed in this repository, in the 'build' directory
 
 ##Using the Scanner
