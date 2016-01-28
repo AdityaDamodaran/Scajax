@@ -123,46 +123,47 @@ public class datastructure {
 	public datastructure(int aid,String aURL,String amethod,String aPage,String aParameter)
 	{
 		this.id=aid;
-		this.title="NA";
+		this.title=amethod;
 		this.URL=aURL;
 		this.method=amethod;
 		this.page=aPage;
 		if(this.method.substring(0, 3).equals("GET"))
 		{
-			
-		//	String temp = this.URL.substring(this.URL.indexOf("?")+1,this.URL.length()-this.URL.indexOf("?")+1);
-		//	this.URL=this.URL.substring(0,this.URL.indexOf("?"));
-		//	temp=temp.substring(1);
-		//	temp=temp.substring(0,temp.length()-1);
-		//	Pattern rJSON = Pattern.compile("/(?:\"(\\\\u[a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\\"])*\"(\\s*:)?|\\b(true|false|null)\\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?|([\\{\\}\\[\\]]))/"); 
-		//	Matcher mJSON = rJSON.matcher(temp);
-		//	Pattern rNVP = Pattern.compile("/(?:\\?|\\&)(?<key>[\\w]+)=(?<value>[\\w+,.-]+)(?:\\:?)(?<option>[\\w,]*)/");
-		//	Matcher mNVP = rNVP.matcher("?"+temp);
-		//	if(mJSON.matches())
-		//	{
-				//JSON
-		//		contenttype="JSON";
-		//		parameters.add(temp);
-		//	}
-		//	else if(mNVP.matches())
-		//	{
-				//NAME-VALUE PAIRS
+			try{
+			String temp = this.URL.substring(this.URL.indexOf("?")+1);
+			this.URL=this.URL.substring(0,this.URL.indexOf("?"));
+			String originalParam=temp;
+			try
+			{
 				contenttype="NVP";
-			//	if(temp.indexOf("&")!=-1)
-			//	{
-			//	String temp2[] = temp.split("&");
-			//	for(String val : temp2)
-			//	{
-			//		parameters.add(val);
+				if(temp.indexOf("&")!=-1)
+				{
+					String temp2[] = temp.split("&");
+					for(String val : temp2)
+					{
+						parameters.add(val);
 					
-			//	}
-			//	}
-			//}
-		//	else
-		//	{
+					}
+				}
+				else
+				{
+					parameters.add(temp);
+									
+				}
+				
+			}
+			catch(Exception e)
+			{
 				contenttype="UNKNOWN";
-				parameters.add(aParameter);
-		//	}
+				parameters.add(originalParam);
+				
+			}
+			}
+			catch(Exception e)
+			{
+				
+			}
+			
 		}
 		else
 		{

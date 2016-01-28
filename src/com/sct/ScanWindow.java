@@ -418,6 +418,7 @@ if(flag==0){
 			public void widgetSelected(SelectionEvent e) {
 	
 			table.clearAll();
+			table.removeAll();
 			int id = Integer.parseInt(list2.getSelection()[0].substring(list2.getSelection()[0].lastIndexOf("\\")+1));
 			sel=id;
 			datastructure dsl = localds[id];
