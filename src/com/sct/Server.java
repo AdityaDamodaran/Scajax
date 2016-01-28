@@ -48,26 +48,18 @@ public Server(String scope)
 						int length=0;
 						String body = "";
 						while ((line = in.readLine()) != null) {
-			                if (line.equals("")) { // last line of request message
-			                                        // header is a
-			                                        // blank line (\r\n\r\n)
-			                    break; // quit while loop when last line of header is
-			                            // reached
+			                if (line.equals("")) {
+			                    break; 
 			                }
 
-			                // checking line if it has information about Content-Length
-			                // weather it has message body or not
-			                if (line.startsWith("Content-Length: ")) { // get the
-			                                                            // content-length
+			                if (line.startsWith("Content-Length: ")) { 
 			                    int index = line.indexOf(':') + 1;
 			                    String len = line.substring(index).trim();
 			                    length = Integer.parseInt(len);
 			                }
 
-			                request= request + line + "\n"; // append the request
-			            } // end of while to read headers
-
-			            // if there is Message body, go in to this loop
+			                request= request + line + "\n";
+			            } 
 			            if (length > 0) {
 			                int read;
 			                while ((read = in.read()) != -1) {
