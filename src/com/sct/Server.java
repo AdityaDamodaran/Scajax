@@ -95,6 +95,15 @@ public Server(String scope)
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			finally{
+				running=0;
+				try {
+					ssock.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 		}
 	}

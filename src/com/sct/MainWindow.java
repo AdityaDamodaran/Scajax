@@ -6,6 +6,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
 public class MainWindow {
+public Server server;
 protected static Shell shell;
 private Text text;
 static Button btnAnalyse;
@@ -42,7 +43,18 @@ public void open() {
 		shell = new Shell();
 		shell.setSize(762, 303);
 		shell.setText("Scajax Beta");
-	
+		shell.addListener(SWT.Close, new Listener()
+	    {
+	        public void handleEvent(Event event)
+	        {
+	        	if(server!=null)
+	        	{
+	        			server.shutdown();
+	        		
+	        	}
+	        }
+	    });
+		
 		//UI
 		Composite composite = new Composite(shell, SWT.NONE);
 		composite.setBounds(0, 0, 962, 243);
@@ -132,7 +144,7 @@ public void open() {
 							else
 							{
 								mode=2;
-							Server server = new Server(text.getText());
+							server = new Server(text.getText());
 							new Thread(server).start();
 							}
 							}
